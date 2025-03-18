@@ -20,3 +20,6 @@ app.get('/users', async (req, res) => {
   const users = await prisma.user.findMany();
   res.json(users);
 });
+
+const authRoutes = require("./routes/auth");
+app.use("/auth", authRoutes);
