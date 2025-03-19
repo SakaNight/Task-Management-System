@@ -2,11 +2,52 @@ const express = require("express");
 const { PrismaClient } = require("@prisma/client");
 const { body, validationResult } = require("express-validator");
 const { authMiddleware } = require("./auth"); // protect the route
-
+const multer = require("multer");
+const path = require("path");
 const prisma = new PrismaClient();
 const router = express.Router();
 
 const VALID_STATUSES = ["todo", "in_progress", "stuck", "done"]; // ✅ 允许的状态
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/"); // ✅ 上传文件的目录
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueName);
+  },
+});
+
+const upload = multer({ storage: storage });
+
+// 🔹 上传文件API
+router.post("/:id/upload", authMiddleware, upload.single("file"), async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const existingTask = await prisma.task.findUnique({ where: { id } });
+    if (!existingTask) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    if (existingTask.userId !== req.user.userId) {
+      return res.status(403).json({ message: "Unauthorized to upload file for this task" });
+    }
+
+    const filePath = req.file ? req.file.path : null;
+
+    const updatedTask = await prisma.task.update({
+      where: { id },
+      data: { attachment: filePath },
+    });
+
+    res.json({ message: "File uploaded successfully", filePath: filePath });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 // 🔹 获取任务列表
 router.get("/", authMiddleware, async (req, res) => {

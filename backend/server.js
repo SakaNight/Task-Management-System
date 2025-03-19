@@ -26,3 +26,4 @@ const taskRoutes = require("./routes/tasks");
 
 app.use("/auth", authRoutes);
 app.use("/tasks", taskRoutes);
+app.use("/uploads", express.static("uploads")); // ✅ 允许访问上传的文件
