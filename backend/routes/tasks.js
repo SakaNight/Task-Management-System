@@ -191,4 +191,34 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   }
 });
 
+// 🔹 获取任务统计信息
+router.get("/stats", authMiddleware, async (req, res) => {
+  try {
+    console.log("获取任务统计 - 用户ID:", req.user.userId);
+
+    // 统计不同状态的任务数量
+    const stats = await prisma.task.groupBy({
+      by: ["status"],
+      _count: {
+        status: true,
+      },
+      where: { 
+        userId: req.user.userId, // 仅统计当前用户的任务
+        status: { in: VALID_STATUSES } // ✅ 只统计合法状态
+      },
+    });
+
+    // 将统计结果转换成 { status: count } 格式
+    const formattedStats = {};
+    stats.forEach(({ status, _count }) => {
+      formattedStats[status] = _count.status;
+    });
+
+    res.json(formattedStats);
+  } catch (error) {
+    console.error("Error fetching task stats:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 module.exports = router;
