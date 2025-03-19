@@ -21,5 +21,8 @@ app.get('/users', async (req, res) => {
   res.json(users);
 });
 
-const authRoutes = require("./routes/auth");
+const { router: authRoutes } = require("./routes/auth"); // ✅ 确保正确解构
+const taskRoutes = require("./routes/tasks");
+
 app.use("/auth", authRoutes);
+app.use("/tasks", taskRoutes);

@@ -24,7 +24,7 @@ model Task {
   id          String  @id @default(uuid())
   title       String
   description String?
-  status      String  @default("todo")
+  status      String  @default("todo") @db.VarChar(20)
   createdAt   DateTime @default(now())
   user        User   @relation(fields: [userId], references: [id])
   userId      String
