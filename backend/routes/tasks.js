@@ -6,6 +6,7 @@ const multer = require("multer");
 const path = require("path");
 const prisma = new PrismaClient();
 const router = express.Router();
+const fs = require("fs");
 
 const VALID_STATUSES = ["todo", "in_progress", "stuck", "done"]; // ✅ 允许的状态
 
@@ -45,6 +46,43 @@ router.post("/:id/upload", authMiddleware, upload.single("file"), async (req, re
     res.json({ message: "File uploaded successfully", filePath: filePath });
   } catch (error) {
     console.error("Error uploading file:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// 🔹 删除任务附件
+router.delete("/:id/attachment", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const task = await prisma.task.findUnique({ where: { id } });
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    if (task.userId !== req.user.userId) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    if (task.attachment) {
+      fs.unlink(task.attachment, (err) => {
+        if (err) {
+          console.warn("⚠️ Failed to delete file:", err.message);
+        } else {
+          console.log("🗑️ Deleted file:", task.attachment);
+        }
+      });
+    }
+
+    await prisma.task.update({
+      where: { id },
+      data: { attachment: null },
+    });
+
+    res.json({ message: "Attachment deleted" });
+  } catch (error) {
+    console.error("❌ Error deleting attachment:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
