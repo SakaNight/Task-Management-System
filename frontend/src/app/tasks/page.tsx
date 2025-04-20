@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 
 type Task = {
@@ -8,11 +9,13 @@ type Task = {
   title: string;
   description: string;
   status: string;
+  attachment?: string;
 };
 
-const statusOptions = ["todo", "in_progress", "stuck", "done"];
+const statusOptions = ["todo", "in progress", "stuck", "done"];
 
 export default function TaskListPage() {
+  const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -21,7 +24,12 @@ export default function TaskListPage() {
   const [status, setStatus] = useState("todo");
 
   useEffect(() => {
-    fetchTasks();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    } else {
+      fetchTasks(); // ✅ 加这一句！
+    }
   }, []);
 
   const fetchTasks = async () => {
@@ -48,9 +56,68 @@ export default function TaskListPage() {
     }
   };
 
+  const handleStatusChange = async (taskId: number, newStatus: string) => {
+    try {
+      await api.put(`/tasks/${taskId}`, { status: newStatus });
+      fetchTasks(); // 刷新列表
+    } catch (err) {
+      alert("Failed to update task status");
+    }
+  };
+
+  const [filter, setFilter] = useState("all");
+  const filteredTasks = tasks.filter((task) =>
+    filter === "all" ? true : task.status === filter
+  );
+
+  const handleDeleteTask = async (taskId: number) => {
+    try {
+      await api.delete(`/tasks/${taskId}`);
+      fetchTasks(); // 删除后刷新任务列表
+    } catch (err) {
+      alert("Failed to delete task");
+    }
+  };
+
+  const handleFileUpload = async (taskId: number, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+  
+    try {
+      await api.post(`/tasks/${taskId}/upload`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      fetchTasks(); // 上传成功后刷新任务列表
+    } catch (err) {
+      alert("Failed to upload file");
+    }
+  };
+
+  const handleDeleteAttachment = async (taskId: number) => {
+    try {
+      await api.delete(`/tasks/${taskId}/attachment`);
+      fetchTasks(); // 刷新任务
+    } catch (err) {
+      alert("Failed to delete attachment");
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-8">
-      <h1 className="text-2xl font-bold">Your Tasks</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Your Tasks</h1>
+        <button
+          onClick={() => {
+            localStorage.removeItem("token");
+            router.push("/login");
+          }}
+          className="text-sm text-red-600 hover:underline"
+        >
+          Logout
+        </button>
+      </div>
 
       {/* 新建任务表单 */}
       <form onSubmit={handleCreateTask} className="bg-white p-4 shadow rounded space-y-4">
@@ -73,7 +140,7 @@ export default function TaskListPage() {
         <select
           className="w-full p-2 border rounded"
           value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={(e) => setStatus(e.target.value)} // ✅ 正确绑定新建状态
         >
           {statusOptions.map((s) => (
             <option key={s} value={s}>
@@ -81,6 +148,20 @@ export default function TaskListPage() {
             </option>
           ))}
         </select>
+        <div className="flex justify-end">
+        <select
+          className="p-2 border rounded"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        >
+          <option value="all">All</option>
+          {statusOptions.map((s) => (
+            <option key={s} value={s}>
+              {s.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+            </option>
+          ))}
+        </select>
+        </div>
         <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
           Add Task
         </button>
@@ -93,13 +174,63 @@ export default function TaskListPage() {
         <p>No tasks found.</p>
       ) : (
         <ul className="space-y-4">
-          {tasks.map((task) => (
+          {filteredTasks.map((task) => (
             <li key={task.id} className="p-4 bg-white shadow rounded">
               <h2 className="font-semibold text-lg">{task.title}</h2>
               <p className="text-gray-600">{task.description}</p>
-              <span className="inline-block mt-2 px-3 py-1 text-sm rounded bg-blue-100 text-blue-800">
-                {task.status}
-              </span>
+
+              <div className="flex items-center gap-2 mt-2">
+                <select
+                  className="p-1 border rounded"
+                  value={task.status}
+                  onChange={(e) => handleStatusChange(task.id, e.target.value)}
+                >
+                  {statusOptions.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  onClick={() => handleDeleteTask(task.id)}
+                  className="text-sm text-red-600 hover:underline"
+                >
+                  Delete
+                </button>
+              </div>
+
+              {/* ✅ 上传文件区域 */}
+              <div className="mt-2">
+                <input
+                  type="file"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileUpload(task.id, file);
+                  }}
+                />
+              </div>
+
+              {/* ✅ 显示下载链接 */}
+              {task.attachment && (
+                <div className="flex gap-2 mt-2 items-center">
+                  <a
+                    href={`http://localhost:5001/${task.attachment}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 text-sm hover:underline"
+                  >
+                    View Attachment
+                  </a>
+
+                  <button
+                    onClick={() => handleDeleteAttachment(task.id)}
+                    className="text-red-600 text-sm hover:underline"
+                  >
+                    Delete Attachment
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>
