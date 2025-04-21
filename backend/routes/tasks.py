@@ -61,3 +61,15 @@ async def update_task_status(
         data={"status": update.status}
     )
     return updated_task
+
+@router.delete("/{task_id}")
+async def delete_task(task_id: str, user = Depends(get_current_user)):
+    task = await db.task.find_unique(where={"id": task_id})
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    if task.userId != user["userId"]:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this task")
+
+    await db.task.delete(where={"id": task_id})
+    return {"message": "Task deleted successfully"}
