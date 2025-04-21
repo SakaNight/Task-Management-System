@@ -136,6 +136,12 @@ export default function TaskListPage() {
         >
           Logout
         </button>
+        <button
+          onClick={() => router.push("/tasks/stats")}
+          className="text-sm text-blue-600 hover:underline"
+        >
+          View Stats
+        </button>
       </div>
 
       {/* 新建任务表单 */}
