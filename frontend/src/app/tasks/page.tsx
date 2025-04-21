@@ -152,7 +152,6 @@ useEffect(() => {
         </button>
       </div>
 
-      {/* 任务列表过滤器 */}
       {/* 新建任务表单 */}
       <form onSubmit={handleCreateTask} className="bg-white p-4 shadow rounded space-y-4">
         <h2 className="text-xl font-semibold">Create New Task</h2>
@@ -200,6 +199,23 @@ useEffect(() => {
           Add Task
         </button>
       </form>
+
+      {/* 任务列表过滤器 */}
+      <div className="flex justify-between items-center mt-4">
+        <h2 className="text-xl font-semibold">Filter Tasks</h2>
+        <select
+          className="p-2 border rounded"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        >
+          <option value="all">All</option>
+          {statusOptions.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* 任务列表 */}
       {loading ? (
