@@ -24,7 +24,7 @@ export default function LoginPage() {
       localStorage.setItem("token", res.data.token);
       router.push("/tasks");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed");
+      setError(err?.response?.data?.message || "Registration failed");
     }
   };
 

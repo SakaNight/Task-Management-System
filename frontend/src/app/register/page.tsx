@@ -19,7 +19,7 @@ export default function RegisterPage() {
       });
       router.push("/login"); // ✅ 注册成功跳转
     } catch (err: any) {
-      setError(err.response?.data?.message || "Registration failed");
+      setError(err?.response?.data?.message || "Registration failed");
     }
   };
 

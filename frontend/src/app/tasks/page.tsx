@@ -12,13 +12,12 @@ type Task = {
   attachment?: string;
 };
 
-const statusOptions = ["todo", "in progress", "stuck", "done"];
+const statusOptions = ["todo", "in_progress", "stuck", "done"];
 
 export default function TaskListPage() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("todo");
@@ -37,7 +36,7 @@ export default function TaskListPage() {
       const res = await api.get<Task[]>("/tasks");
       setTasks(res.data);
     } catch (err) {
-      setError("Failed to fetch tasks");
+      // setError("Failed to fetch tasks");
     } finally {
       setLoading(false);
     }
@@ -140,7 +139,7 @@ export default function TaskListPage() {
         <select
           className="w-full p-2 border rounded"
           value={status}
-          onChange={(e) => setStatus(e.target.value)} // ✅ 正确绑定新建状态
+          onChange={(e) => setStatus(e.target.value)}
         >
           {statusOptions.map((s) => (
             <option key={s} value={s}>
@@ -157,7 +156,7 @@ export default function TaskListPage() {
           <option value="all">All</option>
           {statusOptions.map((s) => (
             <option key={s} value={s}>
-              {s.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+              {s}
             </option>
           ))}
         </select>
