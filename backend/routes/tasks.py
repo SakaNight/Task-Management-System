@@ -6,6 +6,7 @@ from prisma.models import Task
 from typing import Optional
 import os
 import shutil
+from uuid import uuid4
 
 class TaskIn(BaseModel):
     title: str
@@ -114,12 +115,10 @@ async def upload_file(task_id: str, file: UploadFile = File(...), user = Depends
 @router.get("/stats")
 async def get_task_stats(user=Depends(get_current_user)):
     user_id = user["userId"]
+    tasks = await db.task.find_many(where={"userId": user_id})
 
-    todo_count = await db.task.count(where={"userId": user_id, "status": "todo"})
-    done_count = await db.task.count(where={"userId": user_id, "status": "done"})
+    stats = {}
+    for task in tasks:
+        stats[task.status] = stats.get(task.status, 0) + 1
 
-    return {
-        "userId": user_id,
-        "todo": todo_count,
-        "done": done_count
-    }
+    return stats
