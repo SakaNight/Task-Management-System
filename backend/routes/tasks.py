@@ -34,6 +34,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 def test_token(user = Depends(get_current_user)):
     return {"message": "Token is valid!", "user": user}
 
+# 创建任务接口
 @router.post("/", response_model=TaskOut)
 async def create_task(task_in: TaskIn, user=Depends(get_current_user)):
     task = await db.task.create(
@@ -46,6 +47,7 @@ async def create_task(task_in: TaskIn, user=Depends(get_current_user)):
     )
     return task
 
+# 更新任务状态接口
 @router.put("/{id}")
 async def update_task_status(
     id: str,
@@ -67,6 +69,7 @@ async def update_task_status(
     )
     return updated_task
 
+# 删除任务接口
 @router.delete("/{task_id}")
 async def delete_task(task_id: str, user = Depends(get_current_user)):
     task = await db.task.find_unique(where={"id": task_id})
@@ -79,6 +82,7 @@ async def delete_task(task_id: str, user = Depends(get_current_user)):
     await db.task.delete(where={"id": task_id})
     return {"message": "Task deleted successfully"}
 
+# 文件上传接口
 @router.post("/{task_id}/upload")
 async def upload_file(task_id: str, file: UploadFile = File(...), user = Depends(get_current_user)):
     # 1. 查找任务
@@ -105,3 +109,17 @@ async def upload_file(task_id: str, file: UploadFile = File(...), user = Depends
     )
 
     return {"message": "File uploaded", "path": file_path}
+
+# 任务统计接口
+@router.get("/stats")
+async def get_task_stats(user=Depends(get_current_user)):
+    user_id = user["userId"]
+
+    todo_count = await db.task.count(where={"userId": user_id, "status": "todo"})
+    done_count = await db.task.count(where={"userId": user_id, "status": "done"})
+
+    return {
+        "userId": user_id,
+        "todo": todo_count,
+        "done": done_count
+    }
