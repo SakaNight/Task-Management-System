@@ -22,6 +22,11 @@ export default function TaskListPage() {
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("todo");
 
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editedTitle, setEditedTitle] = useState("");
+  const [editedDescription, setEditedDescription] = useState("");
+  const [editedStatus, setEditedStatus] = useState("todo");
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -103,6 +108,21 @@ export default function TaskListPage() {
     }
   };
 
+  const handleSaveEdit = async (e: React.FormEvent, taskId: string) => {
+    e.preventDefault();
+    try {
+      await api.put(`/tasks/${taskId}`, {
+        title: editedTitle,
+        description: editedDescription,
+        status: editedStatus,
+      });
+      setEditingTaskId(null);
+      fetchTasks(); // 刷新任务
+    } catch (err) {
+      alert("Failed to update task");
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-8">
       <div className="flex justify-between items-center">
@@ -175,8 +195,52 @@ export default function TaskListPage() {
         <ul className="space-y-4">
           {filteredTasks.map((task) => (
             <li key={task.id} className="p-4 bg-white shadow rounded">
-              <h2 className="font-semibold text-lg">{task.title}</h2>
-              <p className="text-gray-600">{task.description}</p>
+              {editingTaskId === task.id.toString() ? (
+                <form
+                  onSubmit={(e) => handleSaveEdit(e, task.id.toString())}
+                  className="space-y-2 mt-2"
+                >
+                  <input
+                    type="text"
+                    value={editedTitle}
+                    onChange={(e) => setEditedTitle(e.target.value)}
+                    className="w-full border p-2 rounded"
+                  />
+                  <textarea
+                    value={editedDescription}
+                    onChange={(e) => setEditedDescription(e.target.value)}
+                    className="w-full border p-2 rounded"
+                  />
+                  <select
+                    value={editedStatus}
+                    onChange={(e) => setEditedStatus(e.target.value)}
+                    className="w-full border p-2 rounded"
+                  >
+                    {statusOptions.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="flex gap-2">
+                    <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded">
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingTaskId(null)}
+                      className="bg-gray-500 text-white px-3 py-1 rounded"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <h2 className="font-semibold text-lg">{task.title}</h2>
+                  <p className="text-gray-600">{task.description}</p>
+                </>
+              )}
 
               <div className="flex items-center gap-2 mt-2">
                 <select
@@ -196,6 +260,17 @@ export default function TaskListPage() {
                   className="text-sm text-red-600 hover:underline"
                 >
                   Delete
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingTaskId(task.id.toString());
+                    setEditedTitle(task.title);
+                    setEditedDescription(task.description || "");
+                    setEditedStatus(task.status);
+                  }}
+                  className="text-blue-600 text-sm hover:underline"
+                >
+                  Edit
                 </button>
               </div>
 
