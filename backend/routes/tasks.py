@@ -25,7 +25,6 @@ def test_token(user = Depends(get_current_user)):
 
 @router.post("/", response_model=TaskOut)
 async def create_task(task_in: TaskIn, user=Depends(get_current_user)):
-    print("🧾 当前用户 ID：", user["userId"])  # 🔍 打印 userId
     task = await db.task.create(
         data={
             "title": task_in.title,
@@ -35,3 +34,4 @@ async def create_task(task_in: TaskIn, user=Depends(get_current_user)):
         }
     )
     return task
+
