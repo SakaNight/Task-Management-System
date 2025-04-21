@@ -27,14 +27,22 @@ export default function TaskListPage() {
   const [editedDescription, setEditedDescription] = useState("");
   const [editedStatus, setEditedStatus] = useState("todo");
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-    } else {
-      fetchTasks(); // ✅ 加这一句！
-    }
-  }, []);
+useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    router.push("/login");
+    return;
+  }
+
+  api.interceptors.request.use((config) => {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  });
+
+  fetchTasks(); // ✅ 加上这句，获取任务列表
+}, [router]); // ✅ 加 router 依赖
 
   const fetchTasks = async () => {
     try {
@@ -144,6 +152,7 @@ export default function TaskListPage() {
         </button>
       </div>
 
+      {/* 任务列表过滤器 */}
       {/* 新建任务表单 */}
       <form onSubmit={handleCreateTask} className="bg-white p-4 shadow rounded space-y-4">
         <h2 className="text-xl font-semibold">Create New Task</h2>

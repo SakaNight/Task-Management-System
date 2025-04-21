@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
@@ -7,14 +8,14 @@ import api from "@/lib/api";
 const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff6b6b"];
 
 export default function TaskStatsPage() {
-    const [data, setData] = useState<{ name: string; value: number }[]>([]);
+  const [data, setData] = useState<{ name: string; value: number }[]>([]);
 
   useEffect(() => {
     const fetchStats = async () => {
       const res = await api.get("/tasks/stats");
+      console.log("✅ 后端返回的统计数据:", res.data);
       const stats = res.data as Record<string, number>;
 
-      // 转换为 Recharts 需要的数据格式
       const formatted = Object.keys(stats).map((key) => ({
         name: key.replace("_", " "),
         value: stats[key],
@@ -29,7 +30,7 @@ export default function TaskStatsPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
       <h2 className="text-2xl font-bold mb-6">Task Status Statistics</h2>
-      <PieChart width={400} height={400}>
+      <PieChart width={600} height={500}>
         <Pie
           data={data}
           cx="50%"
