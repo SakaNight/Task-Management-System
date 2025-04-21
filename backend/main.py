@@ -1,0 +1,23 @@
+# backend/main.py
+from fastapi import FastAPI
+from routes.auth import router as auth_router
+from routes.tasks import router as task_router
+from routes import tasks
+from db import db  # ✅ 引入 Prisma 实例
+
+app = FastAPI()
+
+@app.on_event("startup")
+async def startup():
+    await db.connect()
+
+@app.on_event("shutdown")
+async def shutdown():
+    await db.disconnect()
+
+app.include_router(auth_router, prefix="/auth")
+app.include_router(task_router, prefix="/tasks")
+
+@app.get("/")
+def read_root():
+    return {"message": "Task Management API is working!"}
