@@ -1,10 +1,9 @@
-# backend/main.py
 from fastapi import FastAPI
 from routes.auth import router as auth_router
 from routes.tasks import router as task_router
-from routes import tasks
 from db import db  # ✅ 引入 Prisma 实例
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -18,10 +17,7 @@ async def shutdown():
 
 app.include_router(auth_router, prefix="/auth")
 app.include_router(task_router, prefix="/tasks")
-
-@app.get("/")
-def read_root():
-    return {"message": "Task Management API is working!"}
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # ✅ 允许所有源（开发阶段）
 app.add_middleware(
@@ -31,3 +27,7 @@ app.add_middleware(
     allow_methods=["*"],  # 允许所有方法，包括 OPTIONS
     allow_headers=["*"],
 )
+
+@app.get("/")
+def read_root():
+    return {"message": "Task Management API is working!"}

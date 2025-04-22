@@ -19,6 +19,10 @@ class TaskOut(BaseModel):
     description: str
     status: str
     userId: str
+    attachment: Optional[str] = None  # ✅ 添加这一行
+
+    class Config:
+        from_attributes = True  # ✅ 修复 orm_mode 的警告（Pydantic v2）
 
 
 VALID_STATUSES = ["todo", "in_progress", "stuck", "done"]
@@ -47,6 +51,12 @@ async def create_task(task_in: TaskIn, user=Depends(get_current_user)):
         }
     )
     return task
+
+# 获取当前用户的所有任务
+@router.get("/", response_model=list[TaskOut])
+async def get_tasks(user=Depends(get_current_user)):
+    tasks = await db.task.find_many(where={"userId": user["userId"]})
+    return tasks
 
 # 更新任务状态接口
 @router.put("/{id}")
@@ -110,6 +120,27 @@ async def upload_file(task_id: str, file: UploadFile = File(...), user = Depends
     )
 
     return {"message": "File uploaded", "path": file_path}
+
+# 附件删除接口
+@router.delete("/{task_id}/attachment")
+async def delete_attachment(task_id: str, user=Depends(get_current_user)):
+    task = await db.task.find_unique(where={"id": task_id})
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    if task.userId != user["userId"]:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    # 删除文件
+    if task.attachment and os.path.exists(task.attachment):
+        os.remove(task.attachment)
+
+    # 清除数据库字段
+    await db.task.update(
+        where={"id": task_id},
+        data={"attachment": None}
+    )
+
+    return {"message": "Attachment deleted"}
 
 # 任务统计接口
 @router.get("/stats")
