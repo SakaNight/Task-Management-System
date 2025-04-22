@@ -1,33 +1,30 @@
-# Task-Management-System
+# 📝 Task Management System
 
-🚀 A full-stack Task Management System built with **Next.js (React) & Express.js (Node.js)**.
+A full-stack task management system with user authentication, task creation, filtering, file upload, and status analytics.
 
-## 📌 Features
-- 🛡️ **User Authentication** (JWT & OAuth)
-- ✅ **Task Management** (Create, Update, Delete)
-- 📂 **File Uploads to AWS S3 / Firebase Storage**
-- 📊 **REST API** (For Frontend Integration)
-- 🗄️ **Database** (PostgreSQL with Prisma ORM)
-- 🐳 **Docker Deployment on AWS EC2**
-- 🔄 **CI/CD with GitHub Actions**
+## ✨ Features
 
----
+- 🔐 **Authentication**: Register/Login with JWT-based auth
+- ✅ **Task Management**: Create, update, delete, filter by status
+- 📁 **File Upload**: Attach and delete files for each task
+- 📊 **Task Statistics**: View task status distribution as pie chart
+- 🐳 **Dockerized**: Easily run with `docker-compose`
 
-## 📂 Tech Stack
-| Module | Technology |
-|--------|------------|
-| **Frontend** | Next.js (React + TypeScript) |
-| **Backend** | Express.js (Node.js) |
-| **Database** | PostgreSQL + Prisma ORM |
-| **Authentication** | JWT / OAuth |
-| **Storage** | AWS S3 / Firebase Storage |
-| **Deployment** | Docker + AWS EC2 |
-| **CI/CD** | GitHub Actions |
+## 🧱 Tech Stack
 
----
+| Layer       | Stack                          |
+|-------------|--------------------------------|
+| Frontend    | Next.js + TypeScript + Tailwind |
+| Backend     | FastAPI + Python               |
+| Database    | PostgreSQL                     |
+| ORM         | Prisma (Python client)         |
+| Auth        | JWT                            |
+| Deployment  | Docker + Docker Compose        |
 
-## 🛠️ Setup & Installation
-### **1️⃣ Clone the Repository**
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
 ```bash
 git clone https://github.com/your-username/task-management-system.git
 cd task-management-system

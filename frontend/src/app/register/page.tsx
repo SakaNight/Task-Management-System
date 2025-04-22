@@ -17,7 +17,7 @@ export default function RegisterPage() {
         email,
         password,
       });
-      router.push("/login"); // ✅ 注册成功跳转
+      router.push("/login");
     } catch (err: any) {
       setError(err?.response?.data?.message || "Registration failed");
     }

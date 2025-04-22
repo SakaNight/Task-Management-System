@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5001", // ✅ 后端服务地址
+  baseURL: "http://localhost:5001",
 });
 
 if (typeof window !== "undefined") {

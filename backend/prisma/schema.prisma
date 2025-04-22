@@ -19,7 +19,7 @@ model Task {
   title       String
   description String
   status      String   @default("todo")
-  attachment  String? // 可选附件路径
+  attachment  String? 
   userId      String
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])

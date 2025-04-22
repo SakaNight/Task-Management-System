@@ -32,8 +32,8 @@ export default function LoginPage() {
         }
       );
   
-      localStorage.setItem("token", res.data.access_token);  // 注意这里是 access_token
-      router.push("/tasks");
+      localStorage.setItem("token", res.data.access_token);
+      router.push("/tasks"); 
     } catch (err: any) {
       console.error(err);
       setError(err?.response?.data?.detail || "Login failed");

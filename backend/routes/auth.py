@@ -1,5 +1,3 @@
-# backend/routes/auth.py
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -8,7 +6,7 @@ from pydantic import BaseModel
 from passlib.hash import bcrypt
 from prisma import Prisma
 import os
-from db import db  # ✅ 从 db.py 导入全局连接
+from db import db
 
 load_dotenv()
 
@@ -45,7 +43,7 @@ async def register(user_in: UserIn):
 @router.post("/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await db.user.find_unique(where={"email": form_data.username})
-    if not user or not bcrypt.verify(form_data.password, user.hashedPassword):  # password field name may differ!
+    if not user or not bcrypt.verify(form_data.password, user.hashedPassword):
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
     token_data = {"userId": user.id}

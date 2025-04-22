@@ -19,10 +19,10 @@ class TaskOut(BaseModel):
     description: str
     status: str
     userId: str
-    attachment: Optional[str] = None  # ✅ 添加这一行
+    attachment: Optional[str] = None
 
     class Config:
-        from_attributes = True  # ✅ 修复 orm_mode 的警告（Pydantic v2）
+        from_attributes = True
 
 
 VALID_STATUSES = ["todo", "in_progress", "stuck", "done"]
@@ -62,7 +62,7 @@ async def get_tasks(user=Depends(get_current_user)):
 @router.put("/{id}")
 async def update_task_status(
     id: str,
-    update: TaskUpdate,  # ✅ 不需要 Depends
+    update: TaskUpdate,
     user=Depends(get_current_user),
 ):
     if update.status not in VALID_STATUSES:
@@ -96,7 +96,7 @@ async def delete_task(task_id: str, user = Depends(get_current_user)):
 # 文件上传接口
 @router.post("/{task_id}/upload")
 async def upload_file(task_id: str, file: UploadFile = File(...), user = Depends(get_current_user)):
-    # 1. 查找任务
+
     task = await db.task.find_unique(where={"id": task_id})
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
