@@ -5,7 +5,8 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 
 type LoginResponse = {
-  token: string;
+  access_token: string;
+  token_type: string;
 };
 
 export default function LoginPage() {
@@ -17,14 +18,25 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const params = new URLSearchParams();
+      params.append("username", email);
+      params.append("password", password);
+  
       const res = await axios.post<LoginResponse>(
         "http://localhost:5001/auth/login",
-        { email, password }
+        params,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
       );
-      localStorage.setItem("token", res.data.token);
-      router.push("/tasks");
+  
+      localStorage.setItem("token", res.data.access_token);
+      router.push("/tasks"); 
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Registration failed");
+      console.error(err);
+      setError(err?.response?.data?.detail || "Login failed");
     }
   };
 

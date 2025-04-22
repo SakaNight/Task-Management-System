@@ -41,8 +41,8 @@ useEffect(() => {
     return config;
   });
 
-  fetchTasks(); // ✅ 加上这句，获取任务列表
-}, [router]); // ✅ 加 router 依赖
+  fetchTasks();
+}, [router]);
 
   const fetchTasks = async () => {
     try {
@@ -62,7 +62,7 @@ useEffect(() => {
       setTitle("");
       setDescription("");
       setStatus("todo");
-      fetchTasks(); // 🔄 刷新列表
+      fetchTasks();
     } catch (err) {
       alert("Failed to create task");
     }
@@ -71,7 +71,7 @@ useEffect(() => {
   const handleStatusChange = async (taskId: number, newStatus: string) => {
     try {
       await api.put(`/tasks/${taskId}`, { status: newStatus });
-      fetchTasks(); // 刷新列表
+      fetchTasks();
     } catch (err) {
       alert("Failed to update task status");
     }
@@ -85,7 +85,7 @@ useEffect(() => {
   const handleDeleteTask = async (taskId: number) => {
     try {
       await api.delete(`/tasks/${taskId}`);
-      fetchTasks(); // 删除后刷新任务列表
+      fetchTasks();
     } catch (err) {
       alert("Failed to delete task");
     }
@@ -101,7 +101,7 @@ useEffect(() => {
           "Content-Type": "multipart/form-data",
         },
       });
-      fetchTasks(); // 上传成功后刷新任务列表
+      fetchTasks();
     } catch (err) {
       alert("Failed to upload file");
     }
@@ -110,7 +110,7 @@ useEffect(() => {
   const handleDeleteAttachment = async (taskId: number) => {
     try {
       await api.delete(`/tasks/${taskId}/attachment`);
-      fetchTasks(); // 刷新任务
+      fetchTasks();
     } catch (err) {
       alert("Failed to delete attachment");
     }
@@ -125,7 +125,7 @@ useEffect(() => {
         status: editedStatus,
       });
       setEditingTaskId(null);
-      fetchTasks(); // 刷新任务
+      fetchTasks();
     } catch (err) {
       alert("Failed to update task");
     }

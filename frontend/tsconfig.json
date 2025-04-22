@@ -18,7 +18,7 @@
         "name": "next"
       }
     ],
-    "baseUrl": ".",          // ✅ 这个必须有
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }

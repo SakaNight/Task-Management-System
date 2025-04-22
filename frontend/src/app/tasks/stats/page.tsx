@@ -13,7 +13,6 @@ export default function TaskStatsPage() {
   useEffect(() => {
     const fetchStats = async () => {
       const res = await api.get("/tasks/stats");
-      console.log("✅ 后端返回的统计数据:", res.data);
       const stats = res.data as Record<string, number>;
 
       const formatted = Object.keys(stats).map((key) => ({
