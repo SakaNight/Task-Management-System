@@ -5,3 +5,4 @@ prisma
 python-jose[cryptography]
 python-dotenv
 passlib[bcrypt]
+python-multipart
