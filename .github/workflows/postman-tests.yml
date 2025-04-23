@@ -14,18 +14,39 @@ jobs:
   run-postman-tests:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: task_user
+          POSTGRES_PASSWORD: securepassword
+          POSTGRES_DB: task_db
+        ports:
+          - 5432:5432
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          uvicorn main:app --host 0.0.0.0 --port 8000 &
+          sleep 5  # 给 uvicorn 启动一点时间
+
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install newman (Postman CLI tool)
         run: npm install -g newman
 
       - name: Run Postman collection
-        run: |
-          newman run backend/tests/TaskManagement.postman_collection.json
+        run: newman run backend/tests/TaskManagement.postman_collection.json

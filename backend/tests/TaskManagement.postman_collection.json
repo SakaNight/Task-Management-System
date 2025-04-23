@@ -52,12 +52,12 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "test2@example.com",
+							"value": "test@example.com",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "test1232",
+							"value": "test123",
 							"type": "text"
 						}
 					]
