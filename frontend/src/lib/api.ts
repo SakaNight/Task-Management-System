@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5001",
+  baseURL: "http://3.17.76.238:5001",
 });
 
 if (typeof window !== "undefined") {
