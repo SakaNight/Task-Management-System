@@ -37,16 +37,21 @@ jobs:
         run: |
           cd backend
           pip install -r requirements.txt
-          uvicorn main:app --host 0.0.0.0 --port 8000 &
-          sleep 5  # 给 uvicorn 启动一点时间
+
+      - name: Start FastAPI backend
+        run: |
+          cd backend
+          nohup uvicorn main:app --host 0.0.0.0 --port 8000 > backend.log 2>&1 &
+          sleep 5
+          curl --fail http://localhost:8000 || (echo "Backend did not start" && cat backend.log && exit 1)
 
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "18"
 
-      - name: Install newman (Postman CLI tool)
+      - name: Install newman
         run: npm install -g newman
 
-      - name: Run Postman collection
+      - name: Run Postman tests
         run: newman run backend/tests/TaskManagement.postman_collection.json
