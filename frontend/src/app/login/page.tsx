@@ -23,7 +23,7 @@ export default function LoginPage() {
       params.append("password", password);
   
       const res = await axios.post<LoginResponse>(
-        "http://localhost:5001/auth/login",
+        "http://3.17.76.238:5001/auth/login",
         params,
         {
           headers: {

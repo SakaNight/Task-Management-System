@@ -320,7 +320,7 @@ useEffect(() => {
               {task.attachment && (
                 <div className="flex gap-2 mt-2 items-center">
                   <a
-                    href={`http://localhost:5001/${task.attachment}`}
+                    href={`http://3.17.76.238:5001/${task.attachment}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 text-sm hover:underline"
