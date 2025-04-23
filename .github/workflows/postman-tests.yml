@@ -32,11 +32,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-
-      - name: Install backend dependencies
+    
+      - name: Install backend dependencies & generate Prisma client
         run: |
           cd backend
           pip install -r requirements.txt
+          prisma generate
 
       - name: Start FastAPI backend
         run: |
