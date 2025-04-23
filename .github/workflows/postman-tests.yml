@@ -1,0 +1,31 @@
+name: Postman Integration Tests
+
+on:
+  push:
+    branches:
+      - main
+      - feature
+  pull_request:
+    branches:
+      - main
+      - feature
+
+jobs:
+  run-postman-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install newman (Postman CLI tool)
+        run: npm install -g newman
+
+      - name: Run Postman collection
+        run: |
+          newman run tests/TaskManagement.postman_collection.json
