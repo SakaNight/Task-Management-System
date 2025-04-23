@@ -28,4 +28,4 @@ jobs:
 
       - name: Run Postman collection
         run: |
-          newman run tests/TaskManagement.postman_collection.json
+          newman run backend/tests/TaskManagement.postman_collection.json
