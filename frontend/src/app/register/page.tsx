@@ -1,57 +1,58 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5001/auth/register", {
-        email,
-        password,
-      });
+      await api.post("/auth/register", { email, password });
       router.push("/login");
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Registration failed");
+      setError(err.response?.data?.detail || "Registration failed");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-black text-white">
       <form
         onSubmit={handleRegister}
-        className="bg-white p-8 rounded-lg shadow-md w-96"
+        className="w-full max-w-md bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <h1 className="text-2xl font-bold mb-6 text-center">Sign up</h1>
+        {error && (
+          <p className="bg-red-500 text-white p-2 rounded-md mb-4 text-sm text-center">
+            {error}
+          </p>
+        )}
         <input
           type="email"
           placeholder="Email"
-          className="w-full mb-4 p-2 border rounded"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className="w-full mb-4 p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
         <input
           type="password"
           placeholder="Password"
-          className="w-full mb-4 p-2 border rounded"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          className="w-full mb-6 p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
         <button
           type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+          className="w-full bg-purple-600 hover:bg-purple-700 transition-colors py-3 rounded-lg font-semibold"
         >
-          Register
+          Go
         </button>
       </form>
     </div>

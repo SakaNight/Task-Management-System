@@ -4,52 +4,57 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 
-type Task = {
-  id: number;
+// 定义任务类型
+interface Task {
+  id: string;
   title: string;
   description: string;
   status: string;
   attachment?: string;
-};
+}
 
 const statusOptions = ["todo", "in_progress", "stuck", "done"];
 
-export default function TaskListPage() {
+export default function TasksPage() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("todo");
-
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
   const [editedStatus, setEditedStatus] = useState("todo");
+  const [filter, setFilter] = useState("all");
 
-useEffect(() => {
-  const token = localStorage.getItem("token");
+  const filteredTasks = tasks.filter((task) =>
+    filter === "all" ? true : task.status === filter
+  );
 
-  if (!token) {
-    router.push("/login");
-    return;
-  }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
 
-  api.interceptors.request.use((config) => {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  });
+    if (!token) {
+      router.push("/login");
+      return;
+    }
 
-  fetchTasks();
-}, [router]);
+    api.interceptors.request.use((config) => {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+      return config;
+    });
+
+    fetchTasks();
+  }, [router]);
 
   const fetchTasks = async () => {
     try {
       const res = await api.get<Task[]>("/tasks");
       setTasks(res.data);
     } catch (err) {
-      // setError("Failed to fetch tasks");
+      console.error("Failed to fetch tasks");
     } finally {
       setLoading(false);
     }
@@ -68,7 +73,7 @@ useEffect(() => {
     }
   };
 
-  const handleStatusChange = async (taskId: number, newStatus: string) => {
+  const handleStatusChange = async (taskId: string, newStatus: string) => {
     try {
       await api.put(`/tasks/${taskId}`, { status: newStatus });
       fetchTasks();
@@ -77,12 +82,7 @@ useEffect(() => {
     }
   };
 
-  const [filter, setFilter] = useState("all");
-  const filteredTasks = tasks.filter((task) =>
-    filter === "all" ? true : task.status === filter
-  );
-
-  const handleDeleteTask = async (taskId: number) => {
+  const handleDeleteTask = async (taskId: string) => {
     try {
       await api.delete(`/tasks/${taskId}`);
       fetchTasks();
@@ -91,15 +91,13 @@ useEffect(() => {
     }
   };
 
-  const handleFileUpload = async (taskId: number, file: File) => {
+  const handleFileUpload = async (taskId: string, file: File) => {
     const formData = new FormData();
     formData.append("file", file);
-  
+
     try {
       await api.post(`/tasks/${taskId}/upload`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
       fetchTasks();
     } catch (err) {
@@ -107,7 +105,7 @@ useEffect(() => {
     }
   };
 
-  const handleDeleteAttachment = async (taskId: number) => {
+  const handleDeleteAttachment = async (taskId: string) => {
     try {
       await api.delete(`/tasks/${taskId}/attachment`);
       fetchTasks();
@@ -132,48 +130,52 @@ useEffect(() => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-8">
+    <main className="max-w-5xl mx-auto py-10 space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Your Tasks</h1>
-        <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            router.push("/login");
-          }}
-          className="text-sm text-red-600 hover:underline"
-        >
-          Logout
-        </button>
-        <button
-          onClick={() => router.push("/tasks/stats")}
-          className="text-sm text-blue-600 hover:underline"
-        >
-          View Stats
-        </button>
+        <h1 className="text-3xl font-bold">Your Tasks</h1>
+        <div className="space-x-4">
+          <button
+            onClick={() => router.push("/tasks/stats")}
+            className="text-sm text-violet-500 hover:underline"
+          >
+            View Stats
+          </button>
+          <button
+            onClick={() => {
+              localStorage.removeItem("token");
+              router.push("/login");
+            }}
+            className="text-sm text-red-500 hover:underline"
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
-      {/* 新建任务表单 */}
-      <form onSubmit={handleCreateTask} className="bg-white p-4 shadow rounded space-y-4">
+      <form
+        onSubmit={handleCreateTask}
+        className="bg-neutral-900/80 p-6 rounded-xl border border-neutral-800 space-y-4"
+      >
         <h2 className="text-xl font-semibold">Create New Task</h2>
         <input
           type="text"
           placeholder="Title"
-          className="w-full p-2 border rounded"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          className="w-full px-4 py-2 bg-zinc-800 text-white border border-zinc-700 rounded-md"
           required
         />
         <textarea
           placeholder="Description"
-          className="w-full p-2 border rounded"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          className="w-full px-4 py-2 bg-zinc-800 text-white border border-zinc-700 rounded-md"
           required
         />
         <select
-          className="w-full p-2 border rounded"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
+          className="w-full px-4 py-2 bg-zinc-800 text-white border border-zinc-700 rounded-md"
         >
           {statusOptions.map((s) => (
             <option key={s} value={s}>
@@ -182,29 +184,16 @@ useEffect(() => {
           ))}
         </select>
         <div className="flex justify-end">
-        <select
-          className="p-2 border rounded"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        >
-          <option value="all">All</option>
-          {statusOptions.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+          <button className="bg-violet-600 text-white px-4 py-2 rounded hover:bg-violet-700">
+            Add Task
+          </button>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Add Task
-        </button>
       </form>
 
-      {/* 任务列表过滤器 */}
-      <div className="flex justify-between items-center mt-4">
+      <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Filter Tasks</h2>
         <select
-          className="p-2 border rounded"
+          className="p-2 bg-zinc-800 text-white border border-zinc-700 rounded"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         >
@@ -217,35 +206,37 @@ useEffect(() => {
         </select>
       </div>
 
-      {/* 任务列表 */}
-      {loading ? (
-        <p>Loading...</p>
-      ) : tasks.length === 0 ? (
-        <p>No tasks found.</p>
-      ) : (
-        <ul className="space-y-4">
-          {filteredTasks.map((task) => (
-            <li key={task.id} className="p-4 bg-white shadow rounded">
-              {editingTaskId === task.id.toString() ? (
+      <div className="space-y-4">
+        {loading ? (
+          <p className="text-gray-400">Loading...</p>
+        ) : filteredTasks.length === 0 ? (
+          <p className="text-gray-400">No tasks found.</p>
+        ) : (
+          filteredTasks.map((task) => (
+            <div
+              key={task.id}
+              className="p-6 bg-neutral-900/80 rounded-xl border border-neutral-800"
+            >
+              {editingTaskId === task.id ? (
                 <form
-                  onSubmit={(e) => handleSaveEdit(e, task.id.toString())}
-                  className="space-y-2 mt-2"
+                  onSubmit={(e) => handleSaveEdit(e, task.id)}
+                  className="space-y-2"
                 >
                   <input
                     type="text"
                     value={editedTitle}
                     onChange={(e) => setEditedTitle(e.target.value)}
-                    className="w-full border p-2 rounded"
+                    className="w-full px-4 py-2 bg-zinc-800 text-white border border-zinc-700 rounded-md"
                   />
                   <textarea
                     value={editedDescription}
                     onChange={(e) => setEditedDescription(e.target.value)}
-                    className="w-full border p-2 rounded"
+                    className="w-full px-4 py-2 bg-zinc-800 text-white border border-zinc-700 rounded-md"
                   />
                   <select
                     value={editedStatus}
                     onChange={(e) => setEditedStatus(e.target.value)}
-                    className="w-full border p-2 rounded"
+                    className="w-full px-4 py-2 bg-zinc-800 text-white border border-zinc-700 rounded-md"
                   >
                     {statusOptions.map((s) => (
                       <option key={s} value={s}>
@@ -254,7 +245,10 @@ useEffect(() => {
                     ))}
                   </select>
                   <div className="flex gap-2">
-                    <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded">
+                    <button
+                      type="submit"
+                      className="bg-green-600 text-white px-3 py-1 rounded"
+                    >
                       Save
                     </button>
                     <button
@@ -268,16 +262,16 @@ useEffect(() => {
                 </form>
               ) : (
                 <>
-                  <h2 className="font-semibold text-lg">{task.title}</h2>
-                  <p className="text-gray-600">{task.description}</p>
+                  <h3 className="text-lg font-semibold">{task.title}</h3>
+                  <p className="text-gray-400">{task.description}</p>
                 </>
               )}
 
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex gap-2 mt-2 items-center">
                 <select
-                  className="p-1 border rounded"
                   value={task.status}
                   onChange={(e) => handleStatusChange(task.id, e.target.value)}
+                  className="p-2 bg-zinc-800 text-white border border-zinc-700 rounded"
                 >
                   {statusOptions.map((s) => (
                     <option key={s} value={s}>
@@ -285,27 +279,25 @@ useEffect(() => {
                     </option>
                   ))}
                 </select>
-
                 <button
                   onClick={() => handleDeleteTask(task.id)}
-                  className="text-sm text-red-600 hover:underline"
+                  className="text-sm text-red-500 hover:underline"
                 >
                   Delete
                 </button>
                 <button
                   onClick={() => {
-                    setEditingTaskId(task.id.toString());
+                    setEditingTaskId(task.id);
                     setEditedTitle(task.title);
-                    setEditedDescription(task.description || "");
+                    setEditedDescription(task.description);
                     setEditedStatus(task.status);
                   }}
-                  className="text-blue-600 text-sm hover:underline"
+                  className="text-sm text-violet-500 hover:underline"
                 >
                   Edit
                 </button>
               </div>
 
-              {/* ✅ 上传文件区域 */}
               <div className="mt-2">
                 <input
                   type="file"
@@ -316,30 +308,28 @@ useEffect(() => {
                 />
               </div>
 
-              {/* ✅ 显示下载链接 */}
               {task.attachment && (
-                <div className="flex gap-2 mt-2 items-center">
+                <div className="mt-2 flex gap-2 items-center">
                   <a
                     href={`http://localhost:5001/${task.attachment}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 text-sm hover:underline"
+                    className="text-blue-500 text-sm hover:underline"
                   >
                     View Attachment
                   </a>
-
                   <button
                     onClick={() => handleDeleteAttachment(task.id)}
-                    className="text-red-600 text-sm hover:underline"
+                    className="text-sm text-red-500 hover:underline"
                   >
                     Delete Attachment
                   </button>
                 </div>
               )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+            </div>
+          ))
+        )}
+      </div>
+    </main>
   );
 }
