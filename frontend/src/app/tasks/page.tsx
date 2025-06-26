@@ -40,12 +40,6 @@ export default function TasksPage() {
       return;
     }
 
-    api.interceptors.request.use((config) => {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-      return config;
-    });
-
     fetchTasks();
   }, [router]);
 
