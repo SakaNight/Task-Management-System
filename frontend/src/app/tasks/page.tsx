@@ -32,17 +32,6 @@ export default function TasksPage() {
     filter === "all" ? true : task.status === filter
   );
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-
-    fetchTasks();
-  }, [router]);
-
   const fetchTasks = async () => {
     try {
       const res = await api.get<Task[]>("/tasks");
@@ -53,6 +42,16 @@ export default function TasksPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
+    } else {
+    fetchTasks();
+    }
+  }, [router]);
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
