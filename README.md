@@ -19,7 +19,6 @@ A full-stack task management system with a modern UI, featuring authentication, 
 - File Upload & Download for each task
 - Pie Chart Visualization for task status
 - Responsive, Dark Mode-Ready UI
-- Secure API with Role-Based Access
 - PostgreSQL + Prisma ORM
 
 ---
