@@ -77,7 +77,7 @@ Task-Management-System/
 
 ---
 
-## 🚀 Local Development
+## Local Development
 
 1. Clone the repository
 ```bash
@@ -120,15 +120,6 @@ Now open http://localhost:3000
 
 ---
 
-## Deployment
-
-This project can be deployed using:
-- Docker
-- AWS EC2
-- PostgreSQL managed services
-
----
-
-## 📄 License
+## License
 
 MIT © 2025 [Aries Chen]
