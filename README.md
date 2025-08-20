@@ -1,30 +1,30 @@
-# 📝 Task Management System
+# Task Management System
 
-A full-stack task management system with a modern UI inspired by Vercel, featuring authentication, task CRUD, file attachments, filtering, and visualized task statistics.
+A full-stack task management system with a modern UI, featuring authentication, task CRUD, file attachments, filtering, and visualized task statistics.
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
-### 🏠 Welcome Page
+### Welcome Page
 ![Home](./screenshots/Welcome.jpg)
 
 ---
 
-## 🚀 Features
+## Features
 
-- ✅ **JWT Authentication** (Register / Login / Logout)
-- ✅ **Create / Read / Update / Delete Tasks**
-- ✅ **Task Filtering** by status (todo, in_progress, stuck, done)
-- ✅ **File Upload & Download** for each task
-- ✅ **Pie Chart Visualization** for task status
-- ✅ **Responsive, Dark Mode-Ready UI**
-- ✅ **Secure API with Role-Based Access**
-- ✅ **PostgreSQL + Prisma ORM**
+- JWT Authentication (Register / Login / Logout)
+- Create / Read / Update / Delete Tasks
+- Task Filtering by status (todo, in_progress, stuck, done)
+- File Upload & Download for each task
+- Pie Chart Visualization for task status
+- Responsive, Dark Mode-Ready UI
+- Secure API with Role-Based Access
+- PostgreSQL + Prisma ORM
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```bash
 Task-Management-System/
@@ -38,7 +38,7 @@ Task-Management-System/
 ├── frontend/             # Next.js frontend
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── page.tsx          # Home (welcome) page
+│   │   │   ├── page.tsx          # Home page
 │   │   │   ├── login/page.tsx
 │   │   │   ├── register/page.tsx
 │   │   │   ├── tasks/page.tsx
@@ -59,21 +59,21 @@ Task-Management-System/
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
-- **Next.js 15 (App Router)**
-- **TypeScript**
-- **Tailwind CSS** with custom glassmorphism theme
-- **Recharts** for data visualization
-- **Axios** for API requests
+- Next.js 15 (App Router)
+- TypeScript
+- Tailwind CSS with custom glassmorphism theme
+- Recharts for data visualization
+- Axios for API requests
 
 ### Backend
-- **FastAPI** (Python 3.10+)
-- **JWT Authentication**
-- **Prisma ORM** (prisma-client-py)
-- **PostgreSQL**
-- **Docker** for containerized backend + DB
+- FastAPI (Python 3.10+)
+- JWT Authentication
+- Prisma ORM (prisma-client-py)
+- PostgreSQL
+- Docker for containerized backend + DB
 
 ---
 
@@ -110,22 +110,22 @@ Now open http://localhost:3000
 
 ---
 
-## 🧪 Testing
+## Testing
 
-- ✅ Login & Register
-- ✅ Add/Edit/Delete Task
-- ✅ Attach File to Task
-- ✅ View Pie Chart Stats
-- ✅ Filter by Status
+- Login & Register
+- Add/Edit/Delete Task
+- Attach File to Task
+- View Pie Chart Stats
+- Filter by Status
 
 ---
 
-## 📦 Deployment
+## Deployment
 
 This project can be deployed using:
 - Docker
-- AWS EC2 / Vercel (frontend)
-- PostgreSQL managed services (e.g. Supabase, Neon)
+- AWS EC2
+- PostgreSQL managed services
 
 ---
 
